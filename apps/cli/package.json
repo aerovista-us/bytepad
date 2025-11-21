@@ -1,0 +1,24 @@
+{
+  "name": "bytepad-cli",
+  "version": "3.0.0",
+  "description": "BytePad CLI tool for export, import, and sync operations",
+  "main": "./dist/index.js",
+  "bin": {
+    "bytepad": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "bytepad-core": "file:../../packages/bytepad-core",
+    "bytepad-storage": "file:../../packages/bytepad-storage",
+    "bytepad-types": "file:../../packages/bytepad-types",
+    "commander": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  }
+}
+

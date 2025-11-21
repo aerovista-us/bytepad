@@ -1,0 +1,25 @@
+# Electron Forge
+out/
+.vite/
+
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+

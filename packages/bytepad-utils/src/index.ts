@@ -39,3 +39,5 @@ export function safeJsonStringify(value: any): string {
   }
 }
 
+export { sanitizeHTML } from "./sanitize";
+

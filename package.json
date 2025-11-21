@@ -1,0 +1,17 @@
+{
+  "name": "bytepad",
+  "version": "3.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd apps/web && npm run dev",
+    "build": "cd apps/web && npm run build",
+    "desktop:dev": "cd apps/desktop && npm run start",
+    "desktop:package": "cd apps/desktop && npm run package",
+    "desktop:make": "cd apps/desktop && npm run make",
+    "cli:build": "cd apps/cli && npm run build",
+    "cli:export": "cd apps/cli && npm run build && node dist/index.js export",
+    "cli:import": "cd apps/cli && npm run build && node dist/index.js import",
+    "cli:flush-sync": "cd apps/cli && npm run build && node dist/index.js flush-sync"
+  }
+}
+

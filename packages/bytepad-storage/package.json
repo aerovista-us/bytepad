@@ -1,0 +1,15 @@
+{
+  "name": "bytepad-storage",
+  "version": "3.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "bytepad-types": "file:../bytepad-types",
+    "idb": "^8.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.0"
+  }
+}
+

@@ -26,17 +26,37 @@ yarn build
 
 #### Vercel (Recommended)
 
-1. **Connect repository** to Vercel
-2. **Configure build settings:**
-   - Framework Preset: Next.js
-   - Root Directory: `apps/web`
-   - Build Command: `yarn build`
-   - Output Directory: `.next`
+BytePad includes a `vercel.json` configuration file for automatic setup.
 
-3. **Environment variables** (if needed):
-   - `NEXT_PUBLIC_DEBUG`: Set to enable debug routes
+1. **Connect repository** to Vercel:
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Vercel will auto-detect Next.js and use `vercel.json` settings
 
-4. **Deploy**
+2. **Verify build settings** (should auto-configure):
+   - Framework Preset: **Next.js**
+   - Root Directory: **`apps/web`** (important for monorepo)
+   - Build Command: **`cd apps/web && yarn build`** or `yarn build` (if root is apps/web)
+   - Output Directory: **`.next`** (Next.js default)
+   - Install Command: **`yarn install`** (runs from repo root)
+
+3. **Important for Monorepo:**
+   - **Root Directory must be `apps/web`** - This tells Vercel where the Next.js app is located
+   - If Root Directory is set to `apps/web`, Build Command can be just `yarn build`
+   - If Root Directory is repo root, Build Command must be `cd apps/web && yarn build`
+
+4. **Environment variables** (optional):
+   - `NEXT_PUBLIC_DEBUG`: Set to `true` to enable debug routes in production (not recommended)
+   - Leave unset for production (debug routes are dev-only by default)
+
+5. **Deploy:**
+   - Push to your connected branch (usually `main` or `develop`)
+   - Vercel will automatically deploy on push
+   - Or manually trigger deployment from Vercel dashboard
+
+**Note:** The `vercel.json` file in the repo root automatically configures these settings. If you see a warning about differences between production and project settings, you can either:
+- Use the Production Overrides to match your current settings
+- Or update your project settings to match production (recommended)
 
 #### Netlify
 

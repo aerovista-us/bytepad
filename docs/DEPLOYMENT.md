@@ -58,6 +58,83 @@ BytePad includes a `vercel.json` configuration file for automatic setup.
 - Use the Production Overrides to match your current settings
 - Or update your project settings to match production (recommended)
 
+### How Git → Vercel Deployment Works
+
+Once your repository is connected to Vercel, deployments happen automatically:
+
+1. **Automatic Deployments:**
+   ```bash
+   # Make changes to your code
+   git add .
+   git commit -m "Your changes"
+   git push origin develop  # or main/master
+   ```
+   - Vercel detects the push via webhook
+   - Automatically triggers a new build
+   - Deploys to preview URL (for non-production branches) or production (for main branch)
+
+2. **Branch-Based Deployments:**
+   - **Production Branch** (usually `main` or `master`):
+     - Deploys to your production domain
+     - URL: `your-project.vercel.app`
+   - **Other Branches** (e.g., `develop`, feature branches):
+     - Deploys to preview URLs
+     - URL: `your-branch-your-project.vercel.app`
+     - Each branch gets its own preview deployment
+
+3. **Manual Deployment:**
+   - Go to Vercel Dashboard → Your Project → Deployments
+   - Click "Redeploy" on any previous deployment
+   - Or use Vercel CLI: `vercel --prod`
+
+4. **Verify Connection:**
+   - Go to Vercel Dashboard → Your Project → Settings → Git
+   - Should show: "Connected to GitHub" with your repository
+   - Check that the correct branch is set as Production Branch
+
+5. **Troubleshooting Git → Vercel:**
+   - **No automatic deployments?**
+     - Check Vercel Dashboard → Settings → Git → ensure repository is connected
+     - Verify webhook is active in GitHub repository settings
+   - **Build fails?**
+     - Check build logs in Vercel Dashboard
+     - Verify Root Directory is set to `apps/web`
+     - Ensure `yarn install` completes successfully
+   - **Wrong branch deploying?**
+     - Check Production Branch setting in Vercel Dashboard → Settings → Git
+   - **404 NOT_FOUND error?**
+     - **Project not connected:** Go to Vercel Dashboard → Add New Project → Import your GitHub repository
+     - **Build configuration:** Verify Root Directory is `apps/web` in Vercel Dashboard → Settings → General
+     - **First deployment:** If this is your first deployment, ensure the project is properly imported and connected
+     - **Check deployment status:** Go to Vercel Dashboard → Deployments → check if any deployments exist
+     - **Manual trigger:** Try manually triggering a deployment from Vercel Dashboard → Deployments → "Deploy" button
+     - **Verify vercel.json:** Ensure `vercel.json` is in the repository root (not in `apps/web`)
+     - **Check build logs:** Even if deployment shows 404, check the build logs for actual errors
+   - **"No Next.js version detected" error?**
+     - **Root Directory mismatch:** This is the most common cause. Go to Vercel Dashboard → Your Project → Settings → General → Root Directory
+     - **Must be set to:** `apps/web` (exactly, no trailing slash)
+     - **Verify package.json location:** Ensure `apps/web/package.json` contains `"next"` in dependencies (it does)
+     - **Project settings override:** Vercel Dashboard settings override `vercel.json` - update both
+     - **After fixing:** Go to Deployments → Redeploy the latest deployment
+     - **If still failing:** Delete the project in Vercel and re-import, ensuring Root Directory is set during import
+   - **"The specified Root Directory 'apps/web' does not exist" error?**
+     - **Branch mismatch:** Vercel is deploying from a branch that doesn't have `apps/web` directory or `package.json`
+     - **Check which branch:** Go to Vercel Dashboard → Deployments → check which branch is being deployed (usually `main`)
+     - **Solution 1 - Merge to main:** Merge your `develop` branch into `main`:
+       ```bash
+       git checkout main
+       git merge develop
+       git push origin main
+       ```
+     - **Solution 2 - Change Vercel branch:** Go to Vercel Dashboard → Settings → Git → change Production Branch to `develop`
+     - **Solution 3 - Push to main:** Push your current changes to `main`:
+       ```bash
+       git checkout main
+       git merge develop
+       git push origin main
+       ```
+     - **Verify:** After merging/pushing, check that `apps/web/package.json` exists in the branch Vercel is using
+
 #### Netlify
 
 1. **Connect repository** to Netlify

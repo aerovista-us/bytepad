@@ -17,23 +17,58 @@ try {
 let core: ReturnType<typeof initializeCore> | null = null;
 
 const initializeApp = async () => {
-  // Initialize core in main process
-  core = initializeCore();
-  await core.init();
+  try {
+    console.log("Initializing BytePad app...");
+    
+    // Initialize core in main process
+    console.log("Initializing core...");
+    core = initializeCore();
+    await core.init();
+    console.log("Core initialized successfully");
 
-  // Set up IPC handlers
-  setupIpcHandlers(core);
+    // Set up IPC handlers
+    console.log("Setting up IPC handlers...");
+    setupIpcHandlers(core);
+    console.log("IPC handlers set up");
 
-  // Create application window
-  const mainWindow = createWindow();
+    // Create application window
+    console.log("Creating window...");
+    const mainWindow = createWindow();
+    console.log("Window created");
 
-  // Create application menu
-  createMenu(mainWindow);
+    // Create application menu
+    console.log("Creating menu...");
+    createMenu(mainWindow);
+    console.log("Menu created");
 
-  // Handle window closed
-  mainWindow.on("closed", () => {
-    // Dereference the window object
-  });
+    // Handle window closed
+    mainWindow.on("closed", () => {
+      console.log("Window closed");
+      // Dereference the window object
+    });
+
+    console.log("App initialization complete");
+  } catch (error) {
+    console.error("Failed to initialize app:", error);
+    // Show error dialog
+    const { dialog, BrowserWindow } = require("electron");
+    
+    // Create a window to show the error if no windows exist
+    const errorWindow = new BrowserWindow({
+      width: 600,
+      height: 400,
+      show: true,
+      center: true,
+    });
+    
+    dialog.showErrorBox(
+      "BytePad Startup Error",
+      `Failed to initialize BytePad:\n\n${error instanceof Error ? error.message : String(error)}\n\nCheck the console for details.`
+    );
+    
+    // Don't quit immediately - let user see the error
+    // app.quit();
+  }
 };
 
 // This method will be called when Electron has finished initialization
@@ -53,12 +88,14 @@ app.on("activate", () => {
   }
 });
 
-// Security: Prevent new window creation
+// Security: Prevent new window creation and handle external links
 app.on("web-contents-created", (_, contents) => {
-  contents.on("new-window", (event, navigationUrl) => {
-    event.preventDefault();
+  // Handle external navigation (new window requests)
+  contents.setWindowOpenHandler(({ url }) => {
     // Open external links in default browser
-    require("electron").shell.openExternal(navigationUrl);
+    require("electron").shell.openExternal(url);
+    // Prevent Electron from opening a new window
+    return { action: "deny" };
   });
 });
 

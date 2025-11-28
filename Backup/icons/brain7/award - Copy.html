@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIP Access Award</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(120deg, #111 0%, #292933 100%);
+      color: #efe7dc;
+      font-family: 'Montserrat', Arial, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .award-container {
+      background: linear-gradient(135deg, #22262a 0%, #2c2636 100%);
+      border-radius: 28px;
+      box-shadow: 0 12px 40px 0 #000a 0px 0px 0px 6px #dfa93a44;
+      padding: 3.5rem 2.7rem 2.5rem 2.7rem;
+      max-width: 480px;
+      text-align: center;
+      border: 2.5px solid #bfa045;
+      position: relative;
+      overflow: hidden;
+    }
+    .luxury-ribbon {
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, #ffeaa7 30%, #dfa93a 70%);
+      color: #33280a;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.09em;
+      padding: 0.65em 2.2em 0.5em 2.2em;
+      border-radius: 0 0 14px 14px;
+      box-shadow: 0 8px 20px #dfa93a33;
+      font-weight: bold;
+      z-index: 2;
+      border-bottom: 2.5px solid #bfa04588;
+      text-shadow: 0 1px 0 #fff3, 0 2px 10px #fff1;
+    }
+    .gold-crown {
+      font-size: 3.4rem;
+      margin-bottom: 0.9rem;
+      color: #ffed88;
+      text-shadow: 0 2px 10px #dfa93a66, 0 2px 24px #fff3;
+    }
+    .headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      color: #e8c776;
+      margin-bottom: 0.35em;
+      letter-spacing: 0.02em;
+      text-shadow: 0 0 8px #bfa04566, 0 0 20px #fff6;
+    }
+    .subtitle {
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 1.16rem;
+      color: #dfcfa4;
+      letter-spacing: 0.03em;
+      margin-bottom: 1.2em;
+    }
+    .recipient {
+      font-weight: 600;
+      font-size: 1.08em;
+      color: #ffed88;
+      text-shadow: 0 2px 6px #dfa93a44;
+    }
+    .luxury-message {
+      margin: 2em 0 1.4em 0;
+      color: #efe7dc;
+      font-size: 1.14em;
+      line-height: 1.7;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .btn {
+      margin-top: 2.2em;
+      background: linear-gradient(90deg, #ffeaa7 0%, #dfa93a 100%);
+      color: #342900;
+      border: none;
+      border-radius: 13px;
+      padding: 1rem 2.7rem;
+      font-size: 1.19rem;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      box-shadow: 0 6px 20px #dfa93a50;
+      transition: background 0.2s, color 0.2s, box-shadow 0.18s;
+    }
+    .btn:hover {
+      background: linear-gradient(90deg, #dfa93a 0%, #ffeaa7 100%);
+      color: #111;
+      box-shadow: 0 2px 12px #dfa93a80;
+    }
+    .award-footer {
+      margin-top: 3em;
+      font-size: 1.02em;
+      color: #c9c2ad;
+      opacity: 0.82;
+      font-family: 'Montserrat', Arial, sans-serif;
+      letter-spacing: 0.01em;
+    }
+    .luxury-gradient {
+      background: linear-gradient(90deg, #ffeaa7, #dfa93a, #fffbe2);
+      height: 5px;
+      width: 100%;
+      margin: 2.2em 0 0.7em 0;
+      border-radius: 50px;
+      box-shadow: 0 2px 12px #dfa93a50;
+    }
+  </style>
+</head>
+<body>
+  <div class="award-container">
+    <div class="luxury-ribbon">VIP EXCLUSIVE</div>
+    <div class="gold-crown">👑</div>
+    <h2 class="headline">Access Granted</h2>
+    <div class="subtitle">Congratulations, <span class="recipient">[Recipient Name]</span></div>
+    <div class="luxury-gradient"></div>
+    <div class="luxury-message">
+      You have been selected for an <strong>exceptional privilege</strong>—an experience reserved for those who truly deserve to be celebrated.
+      <br><br>
+      This is your personal invitation to step into a realm of complete comfort, empowerment, and luxury.<br>
+      <span style="color:#e8c776; font-weight:600;">Your pace. Your rules. Your time.</span>
+      <br><br>
+      <em>Allow yourself to receive. Indulge in the moment.  
+      This is your sanctuary—crafted entirely around you.</em>
+    </div>
+    <button class="btn" onclick="alert('Your VIP protocol has been initiated. Further instructions will be delivered privately and securely.')">
+      Claim Your Experience
+    </button>
+    <div class="award-footer">
+      For your eyes only.<br>
+      Complete discretion. Pure celebration.<br>
+      Welcome to the inner circle.
+    </div>
+  </div>
+</body>
+</html>

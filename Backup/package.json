@@ -1,0 +1,29 @@
+{
+  "name": "bytepad",
+  "version": "3.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.0.0 <21.0.0"
+  },
+  "scripts": {
+    "dev": "cd apps/web && npm run dev",
+    "build": "cd apps/web && npm run build",
+    "desktop:dev": "cd apps/desktop && npm run start",
+    "desktop:package": "cd apps/desktop && npm run package",
+    "desktop:make": "cd apps/desktop && npm run make",
+    "cli:build": "cd apps/cli && npm run build",
+    "cli:export": "cd apps/cli && npm run build && node dist/index.js export",
+    "cli:import": "cd apps/cli && npm run build && node dist/index.js import",
+    "cli:flush-sync": "cd apps/cli && npm run build && node dist/index.js flush-sync",
+    "cli:doctor": "cd apps/cli && npm run build && node dist/index.js doctor",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
+  },
+  "devDependencies": {
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "@vitest/coverage-v8": "^1.0.0"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}

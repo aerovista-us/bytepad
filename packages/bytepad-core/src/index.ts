@@ -13,12 +13,30 @@ import {
   validateNote,
   validatePartialBoard,
   validatePartialNote,
-} from "bytepad-types/validation";
+} from "bytepad-types";
 import { sanitizeHTML } from "bytepad-utils";
 import { HistoryManager, type HistoryEntry } from "./history";
-import { BackupManager, type BackupMetadata } from "bytepad-storage/backup";
-import { importLegacyData } from "bytepad-storage/migration";
+import { BackupManager, type BackupMetadata, importLegacyData } from "bytepad-storage";
 
+/**
+ * BytePadCore - The central engine for BytePad operations
+ * 
+ * Manages boards, notes, plugins, history, and storage operations.
+ * Provides a unified API for all BytePad surfaces (Web, Electron, CLI, Panel).
+ * 
+ * @example
+ * ```typescript
+ * import { BytePadCore } from "bytepad-core";
+ * import { indexedDbDriver } from "bytepad-storage";
+ * 
+ * const core = new BytePadCore({
+ *   storage: indexedDbDriver("bytepad-web")
+ * });
+ * 
+ * await core.init();
+ * const boards = core.getAllBoards();
+ * ```
+ */
 export class BytePadCore implements CoreInstance {
   boards: Map<string, Board> = new Map();
   plugins: Plugin[] = [];
@@ -30,6 +48,12 @@ export class BytePadCore implements CoreInstance {
   private transactionInProgress: boolean = false;
   private transactionQueue: Array<() => Promise<void>> = [];
 
+  /**
+   * Creates a new BytePadCore instance
+   * 
+   * @param config - Configuration object containing the storage driver
+   * @param config.storage - Storage driver implementation (IndexedDB, Filesystem, or NXDrive)
+   */
   constructor(config: CoreConfig) {
     this.storage = config.storage;
     // Initialize backup manager (uses localStorage for web, can be overridden)
@@ -38,6 +62,20 @@ export class BytePadCore implements CoreInstance {
     );
   }
 
+  /**
+   * Initialize the core and load boards from storage
+   * 
+   * Validates loaded boards and filters out invalid ones.
+   * Emits 'coreError' event for any invalid boards found.
+   * 
+   * @throws {Error} If storage load fails
+   * 
+   * @example
+   * ```typescript
+   * await core.init();
+   * const boards = core.getAllBoards();
+   * ```
+   */
   async init() {
     try {
       const loaded = await this.storage.load();
@@ -68,19 +106,65 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
+  /**
+   * Register a plugin to extend core functionality
+   * 
+   * Plugins can hook into board/note lifecycle events and sync operations.
+   * 
+   * @param plugin - Plugin object with hook methods
+   * 
+   * @example
+   * ```typescript
+   * core.registerPlugin({
+   *   name: "my-plugin",
+   *   onNoteCreate: (boardId, note, core) => {
+   *     console.log("Note created:", note.id);
+   *   }
+   * });
+   * ```
+   */
   registerPlugin(plugin: Plugin) {
     this.plugins.push(plugin);
     plugin.onRegister?.(this);
   }
 
+  /**
+   * Get all boards
+   * 
+   * @returns Array of all boards in the system
+   */
   getAllBoards(): Board[] {
     return Array.from(this.boards.values());
   }
 
+  /**
+   * Get a board by ID
+   * 
+   * @param id - Board ID
+   * @returns Board object or undefined if not found
+   */
   getBoard(id: string): Board | undefined {
     return this.boards.get(id);
   }
 
+  /**
+   * Create a new board
+   * 
+   * Validates and sanitizes input data. Generates a UUID if no ID provided.
+   * Automatically saves to storage and adds to history for undo/redo.
+   * 
+   * @param data - Optional partial board data (id, name, theme, etc.)
+   * @returns Created Board object
+   * @throws {Error} If validation fails or storage save fails
+   * 
+   * @example
+   * ```typescript
+   * const board = await core.createBoard({
+   *   name: "My Board",
+   *   theme: "dark"
+   * });
+   * ```
+   */
   async createBoard(data?: Partial<Board>): Promise<Board> {
     try {
       // Validate and sanitize input
@@ -128,6 +212,23 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
+  /**
+   * Update an existing board
+   * 
+   * Validates and sanitizes input data. Stores previous state in history for undo.
+   * 
+   * @param id - Board ID to update
+   * @param data - Partial board data to update
+   * @returns Updated Board object or undefined if board not found
+   * @throws {Error} If validation fails or storage save fails
+   * 
+   * @example
+   * ```typescript
+   * const updated = await core.updateBoard(boardId, {
+   *   name: "Updated Name"
+   * });
+   * ```
+   */
   async updateBoard(id: string, data: Partial<Board>): Promise<Board | undefined> {
     try {
       const existing = this.boards.get(id);
@@ -169,6 +270,19 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
+  /**
+   * Delete a board
+   * 
+   * Stores deleted board in history for undo. Removes board from storage.
+   * 
+   * @param id - Board ID to delete
+   * @throws {Error} If storage delete fails
+   * 
+   * @example
+   * ```typescript
+   * await core.deleteBoard(boardId);
+   * ```
+   */
   async deleteBoard(id: string): Promise<void> {
     try {
       const board = this.boards.get(id);
@@ -200,6 +314,25 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
+  /**
+   * Create a new note in a board
+   * 
+   * Validates and sanitizes input data. Sanitizes HTML content to prevent XSS.
+   * Generates a UUID if no ID provided. Automatically saves to storage.
+   * 
+   * @param boardId - ID of the board to add the note to
+   * @param data - Optional partial note data (id, contentHTML, geometry, tags, etc.)
+   * @returns Created Note object
+   * @throws {Error} If board not found, validation fails, or storage save fails
+   * 
+   * @example
+   * ```typescript
+   * const note = await core.createNote(boardId, {
+   *   contentHTML: "<p>My note content</p>",
+   *   geometry: { x: 100, y: 100, w: 200, h: 150, z: 0 }
+   * });
+   * ```
+   */
   async createNote(boardId: string, data?: Partial<Note>): Promise<Note> {
     try {
       const board = this.boards.get(boardId);
@@ -215,9 +348,14 @@ export class BytePadCore implements CoreInstance {
         ? sanitizeHTML(validatedData.contentHTML)
         : "";
       
+      const defaultGeometry = { x: 0, y: 0, w: 200, h: 150, z: 0 };
+      const geometry = validatedData.geometry 
+        ? { ...defaultGeometry, ...validatedData.geometry }
+        : defaultGeometry;
+      
       const note: Note = {
         id: validatedData.id ?? uuid(),
-        geometry: validatedData.geometry ?? { x: 0, y: 0, w: 200, h: 150, z: 0 },
+        geometry: geometry,
         contentHTML: sanitizedContent,
         tags: validatedData.tags ?? [],
         color: validatedData.color ?? "",
@@ -259,6 +397,25 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
+  /**
+   * Update an existing note
+   * 
+   * Validates and sanitizes input data. Sanitizes HTML content if updated.
+   * Stores previous state in history for undo.
+   * 
+   * @param boardId - ID of the board containing the note
+   * @param noteId - ID of the note to update
+   * @param data - Partial note data to update
+   * @returns Updated Note object or undefined if note not found
+   * @throws {Error} If board not found, validation fails, or storage save fails
+   * 
+   * @example
+   * ```typescript
+   * const updated = await core.updateNote(boardId, noteId, {
+   *   contentHTML: "<p>Updated content</p>"
+   * });
+   * ```
+   */
   async updateNote(
     boardId: string,
     noteId: string,
@@ -282,9 +439,15 @@ export class BytePadCore implements CoreInstance {
         ? sanitizeHTML(validatedData.contentHTML)
         : existing.contentHTML;
       
+      // Ensure geometry is fully defined (merge with existing if partial)
+      const updatedGeometry = validatedData.geometry
+        ? { ...existing.geometry, ...validatedData.geometry }
+        : existing.geometry;
+      
       const updated: Note = {
         ...existing,
         ...validatedData,
+        geometry: updatedGeometry,
         contentHTML: sanitizedContent,
         updatedAt: Date.now(),
       };
@@ -323,6 +486,20 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
+  /**
+   * Delete a note from a board
+   * 
+   * Stores deleted note in history for undo. Removes note from board and saves.
+   * 
+   * @param boardId - ID of the board containing the note
+   * @param noteId - ID of the note to delete
+   * @throws {Error} If board not found or storage save fails
+   * 
+   * @example
+   * ```typescript
+   * await core.deleteNote(boardId, noteId);
+   * ```
+   */
   async deleteNote(boardId: string, noteId: string): Promise<void> {
     try {
       const board = this.boards.get(boardId);
@@ -361,11 +538,29 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
+  /**
+   * Enqueue a sync event for plugin processing
+   * 
+   * @param event - Sync event to queue
+   */
   enqueueSync(event: SyncEvent) {
     this.syncQueue.push(event);
     this.broadcast("syncQueued", event);
   }
 
+  /**
+   * Flush the sync queue (process all pending sync events)
+   * 
+   * Calls onSync hook on all registered plugins for each queued event.
+   * Clears the sync queue after processing.
+   * 
+   * @throws {Error} If plugin sync processing fails
+   * 
+   * @example
+   * ```typescript
+   * await core.flushSync();
+   * ```
+   */
   async flushSync() {
     try {
       for (const e of this.syncQueue) {
@@ -441,7 +636,13 @@ export class BytePadCore implements CoreInstance {
     this.events.emit(event, payload);
   }
 
-  // Convenience methods that aggregate across all boards
+  /**
+   * Get all notes from all boards
+   * 
+   * Convenience method that aggregates notes across all boards.
+   * 
+   * @returns Array of all notes in the system
+   */
   getAllNotes(): Note[] {
     const allNotes: Note[] = [];
     this.boards.forEach((board) => {
@@ -450,6 +651,12 @@ export class BytePadCore implements CoreInstance {
     return allNotes;
   }
 
+  /**
+   * Get a note by ID (searches across all boards)
+   * 
+   * @param id - Note ID
+   * @returns Note object or undefined if not found
+   */
   getNote(id: string): Note | undefined {
     for (const board of this.boards.values()) {
       const note = board.notes.find((n) => n.id === id);
@@ -458,6 +665,12 @@ export class BytePadCore implements CoreInstance {
     return undefined;
   }
 
+  /**
+   * Get the board containing a specific note
+   * 
+   * @param noteId - Note ID
+   * @returns Board object containing the note, or undefined if not found
+   */
   getNoteBoard(noteId: string): Board | undefined {
     for (const board of this.boards.values()) {
       const note = board.notes.find((n) => n.id === noteId);
@@ -466,7 +679,21 @@ export class BytePadCore implements CoreInstance {
     return undefined;
   }
 
-  // Undo/Redo methods
+  /**
+   * Undo the last operation
+   * 
+   * Restores the previous state from history. Supports board and note operations.
+   * 
+   * @returns true if undo was successful, false if no history to undo
+   * 
+   * @example
+   * ```typescript
+   * const success = await core.undo();
+   * if (success) {
+   *   console.log("Undo successful");
+   * }
+   * ```
+   */
   async undo(): Promise<boolean> {
     const entry = this.history.undo();
     if (!entry) return false;
@@ -485,6 +712,21 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
+  /**
+   * Redo the last undone operation
+   * 
+   * Re-applies the operation that was undone. Supports board and note operations.
+   * 
+   * @returns true if redo was successful, false if no history to redo
+   * 
+   * @example
+   * ```typescript
+   * const success = await core.redo();
+   * if (success) {
+   *   console.log("Redo successful");
+   * }
+   * ```
+   */
   async redo(): Promise<boolean> {
     const entry = this.history.redo();
     if (!entry) return false;
@@ -503,10 +745,20 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
+  /**
+   * Check if undo is available
+   * 
+   * @returns true if there are operations in history that can be undone
+   */
   canUndo(): boolean {
     return this.history.canUndo();
   }
 
+  /**
+   * Check if redo is available
+   * 
+   * @returns true if there are undone operations that can be redone
+   */
   canRedo(): boolean {
     return this.history.canRedo();
   }
@@ -576,7 +828,24 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
-  // Transaction support for atomic operations
+  /**
+   * Execute operations in a transaction (atomic batch)
+   * 
+   * Ensures all operations in the transaction complete or none do.
+   * Queues subsequent transactions if one is already in progress.
+   * 
+   * @param fn - Async function containing operations to execute atomically
+   * @returns Result of the transaction function
+   * @throws {Error} If any operation in the transaction fails
+   * 
+   * @example
+   * ```typescript
+   * await core.transaction(async () => {
+   *   await core.createBoard({ name: "Board 1" });
+   *   await core.createBoard({ name: "Board 2" });
+   * });
+   * ```
+   */
   async transaction<T>(fn: () => Promise<T>): Promise<T> {
     if (this.transactionInProgress) {
       // Queue the transaction
@@ -615,7 +884,17 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
-  // Backup management methods
+  /**
+   * Create a backup of all boards
+   * 
+   * @returns Backup metadata including ID and timestamp
+   * 
+   * @example
+   * ```typescript
+   * const backup = await core.createBackup();
+   * console.log("Backup created:", backup.id);
+   * ```
+   */
   async createBackup(): Promise<BackupMetadata> {
     const boards = this.getAllBoards();
     const metadata = await this.backupManager.createBackup(boards);
@@ -623,10 +902,29 @@ export class BytePadCore implements CoreInstance {
     return metadata;
   }
 
+  /**
+   * List all available backups
+   * 
+   * @returns Array of backup metadata objects
+   */
   listBackups(): BackupMetadata[] {
     return this.backupManager.listBackups();
   }
 
+  /**
+   * Restore a backup
+   * 
+   * Clears current boards and loads boards from the backup.
+   * Clears history after restore.
+   * 
+   * @param backupId - ID of the backup to restore
+   * @throws {Error} If backup not found or restore fails
+   * 
+   * @example
+   * ```typescript
+   * await core.restoreBackup(backupId);
+   * ```
+   */
   async restoreBackup(backupId: string): Promise<void> {
     try {
       const boards = await this.backupManager.restoreBackup(backupId);
@@ -649,21 +947,56 @@ export class BytePadCore implements CoreInstance {
     }
   }
 
+  /**
+   * Export a backup as JSON string
+   * 
+   * @param backupId - ID of the backup to export
+   * @returns JSON string representation of the backup
+   * @throws {Error} If backup not found
+   */
   async exportBackup(backupId: string): Promise<string> {
     return this.backupManager.exportBackup(backupId);
   }
 
+  /**
+   * Import a backup from JSON string
+   * 
+   * @param jsonData - JSON string representation of the backup
+   * @returns Backup metadata
+   * @throws {Error} If JSON is invalid or import fails
+   */
   async importBackup(jsonData: string): Promise<BackupMetadata> {
     const metadata = await this.backupManager.importBackup(jsonData);
     this.broadcast("backupImported", metadata);
     return metadata;
   }
 
+  /**
+   * Get the most recent backup
+   * 
+   * @returns Latest backup metadata or null if no backups exist
+   */
   getLatestBackup(): BackupMetadata | null {
     return this.backupManager.getLatestBackup();
   }
 
-  // Data migration from old BytePad
+  /**
+   * Import data from legacy BytePad format
+   * 
+   * Converts old note-based format to new board-based format.
+   * Validates and imports boards in a transaction.
+   * Generates new IDs for boards that conflict with existing ones.
+   * 
+   * @param jsonString - JSON string in legacy BytePad format
+   * @returns Array of imported boards
+   * @throws {Error} If JSON is invalid or import fails
+   * 
+   * @example
+   * ```typescript
+   * const boards = await core.importLegacyData(legacyJsonString);
+   * console.log(`Imported ${boards.length} boards`);
+   * ```
+   */
   async importLegacyData(jsonString: string): Promise<Board[]> {
     try {
       const boards = await importLegacyData(jsonString);

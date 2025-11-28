@@ -51,3 +51,8 @@ next-env.d.ts
 # OS
 Thumbs.db
 
+# Large backup files
+*.7z
+BytePad.Backup.*.7z
+Backup/*.7z
+

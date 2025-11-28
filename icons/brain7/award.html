@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exclusive Experience Award</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background: linear-gradient(135deg, #232526 0%, #414345 100%);
+      color: #f8fafc;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .award-container {
+      background: rgba(40, 44, 52, 0.85);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      padding: 2.5rem 2rem 2rem 2rem;
+      max-width: 400px;
+      text-align: center;
+      border: 2px solid #60a5fa;
+      position: relative;
+    }
+    .icon {
+      font-size: 3rem;
+      margin-bottom: 0.7rem;
+      color: #60a5fa;
+    }
+    .glow {
+      text-shadow: 0 0 6px #60a5fa88, 0 0 16px #60a5fa44;
+      color: #60a5fa;
+    }
+    .btn {
+      margin-top: 1.5rem;
+      background: #60a5fa;
+      color: #1e293b;
+      border: none;
+      border-radius: 10px;
+      padding: 0.9rem 2rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px #3b82f655;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn:hover {
+      background: #2563eb;
+      color: #f8fafc;
+    }
+    .award-footer {
+      margin-top: 2.5rem;
+      font-size: 0.95rem;
+      color: #7dd3fc;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="award-container">
+    <div class="icon glow">🏆</div>
+    <h2 class="glow">Access Granted</h2>
+    <p>
+      <strong>Congratulations, <span style="color:#7dd3fc">[Recipient Name]</span>!</strong>
+    </p>
+    <p>
+      You’ve been selected for an <span class="glow">exclusive experience</span>—reserved for those who go above and beyond.
+    </p>
+    <p>
+      This is your invitation to a unique, personalized moment<br>
+      designed entirely around <span style="color:#7dd3fc">your comfort</span>,<br>
+      <span style="color:#7dd3fc">your pace</span>, and <span style="color:#7dd3fc">your rules</span>.
+    </p>
+    <button class="btn" onclick="alert('Protocol Initiated. Further instructions will be delivered privately.')">Claim Your Experience</button>
+    <div class="award-footer">
+      * For your eyes only.<br>
+      Total privacy. Zero expectations. 100% empowerment.
+    </div>
+  </div>
+</body>
+</html>

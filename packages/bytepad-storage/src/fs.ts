@@ -1,7 +1,22 @@
 import { promises as fs } from "fs";
 import { join, dirname } from "path";
-import type { Board, StorageDriver } from "bytepad-types";
+import type { Board, StorageDriver, StorageDriverHealth } from "bytepad-types";
 
+/**
+ * Create a filesystem storage driver
+ * 
+ * Stores boards as JSON files in a directory structure.
+ * Each board is stored in its own directory with a board.json file.
+ * 
+ * @param boardsPath - Path to the boards directory
+ * @returns StorageDriver implementation for filesystem
+ * 
+ * @example
+ * ```typescript
+ * const driver = fsDriver("/path/to/boards");
+ * const core = new BytePadCore({ storage: driver });
+ * ```
+ */
 export function fsDriver(boardsPath: string): StorageDriver {
   const boardsDir = boardsPath;
 
@@ -82,6 +97,29 @@ export function fsDriver(boardsPath: string): StorageDriver {
       } catch (err) {
         console.error("Failed to delete board from filesystem", err);
         throw err;
+      }
+    },
+
+    supportsTransactions(): boolean {
+      return false; // Filesystem doesn't support atomic transactions across multiple files
+    },
+
+    supportsBackup(): boolean {
+      return true; // Can backup entire directory
+    },
+
+    async healthCheck(): Promise<StorageDriverHealth> {
+      try {
+        await ensureBoardsDir();
+        // Try to read the directory
+        await fs.readdir(boardsDir);
+        return { healthy: true };
+      } catch (err: any) {
+        return {
+          healthy: false,
+          message: err.message || "Filesystem health check failed",
+          lastError: err,
+        };
       }
     },
   };

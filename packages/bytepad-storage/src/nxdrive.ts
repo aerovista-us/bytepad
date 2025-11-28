@@ -1,11 +1,24 @@
-import type { Board, StorageDriver } from "bytepad-types";
+import type { Board, StorageDriver, StorageDriverHealth } from "bytepad-types";
 
 /**
- * NXDrive JSON driver for NXCore Panel
- * Reads/writes to NXDrive JSON file via API or direct file access
+ * Create an NXDrive storage driver
  * 
- * Note: This is a placeholder implementation. The actual implementation
- * will depend on how NXCore exposes the NXDrive API.
+ * NXDrive JSON driver for NXCore Panel. Reads/writes to NXDrive JSON file
+ * via API or direct file access.
+ * 
+ * **Note:** This is a placeholder implementation. The actual implementation
+ * will depend on how NXCore exposes the NXDrive API. See `docs/NXDRIVE_STATUS.md`
+ * for current status and requirements.
+ * 
+ * @param filePath - Path to NXDrive JSON file or API endpoint
+ * @returns StorageDriver implementation for NXDrive (placeholder)
+ * 
+ * @example
+ * ```typescript
+ * // When NXCore API is available:
+ * const driver = nxdriveDriver("/srv/NXDrive/bytepad/boards.json");
+ * const core = new BytePadCore({ storage: driver });
+ * ```
  */
 export function nxdriveDriver(filePath: string): StorageDriver {
   // In a real implementation, this would use NXCore APIs or direct file access
@@ -16,7 +29,7 @@ export function nxdriveDriver(filePath: string): StorageDriver {
       try {
         // In NXCore, this would read from /srv/NXDrive/.../bytepad-boards.json
         // For now, try to fetch from the file path
-        if (typeof window !== "undefined" && window.fetch) {
+        if (typeof fetch !== "undefined") {
           const response = await fetch(filePath);
           if (response.ok) {
             const data = await response.json();
@@ -36,7 +49,7 @@ export function nxdriveDriver(filePath: string): StorageDriver {
       try {
         // In NXCore, this would write to /srv/NXDrive/.../bytepad-boards.json
         // For now, try to use fetch PUT or POST
-        if (typeof window !== "undefined" && window.fetch) {
+        if (typeof fetch !== "undefined") {
           // Load existing boards
           const existing = await this.load();
           
@@ -72,6 +85,41 @@ export function nxdriveDriver(filePath: string): StorageDriver {
       } catch (err) {
         console.error("Failed to delete board from NXDrive", err);
         throw err;
+      }
+    },
+
+    supportsTransactions(): boolean {
+      return false; // NXDrive JSON file doesn't support transactions
+    },
+
+    supportsBackup(): boolean {
+      return true; // Can backup JSON file
+    },
+
+    async healthCheck(): Promise<StorageDriverHealth> {
+      try {
+        // Try to access the file path
+        if (typeof fetch !== "undefined") {
+          const response = await fetch(filePath, { method: "HEAD" });
+          if (response.ok || response.status === 404) {
+            // 404 is OK - file doesn't exist yet but path is accessible
+            return { healthy: true };
+          }
+          return {
+            healthy: false,
+            message: `NXDrive endpoint returned status ${response.status}`,
+          };
+        }
+        return {
+          healthy: false,
+          message: "NXDrive not available (not in browser environment)",
+        };
+      } catch (err: any) {
+        return {
+          healthy: false,
+          message: err.message || "NXDrive health check failed",
+          lastError: err,
+        };
       }
     },
   };

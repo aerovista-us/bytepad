@@ -8,8 +8,22 @@ export default defineConfig({
     },
   },
   build: {
+    outDir: ".vite/build/preload",
+    lib: {
+      entry: resolve(__dirname, "./src/preload/index.ts"),
+      formats: ["cjs"],
+      fileName: () => "index.js",
+    },
     rollupOptions: {
-      external: ["electron"],
+      external: [
+        "electron",
+        "path",
+        "fs",
+        "crypto",
+        "os",
+        "util",
+        "events",
+      ],
     },
   },
 });

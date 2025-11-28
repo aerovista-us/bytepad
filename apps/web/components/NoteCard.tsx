@@ -111,5 +111,5 @@ export const NoteCard = memo(function NoteCard({ note, onUpdate, onDelete }: Not
       )}
     </div>
   );
-}
+});
 

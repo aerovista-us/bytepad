@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Diamond Access Award - Landscape</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(120deg, #191a21 0%, #263347 100%);
+      color: #f2f4fa;
+      font-family: 'Montserrat', Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .landscape-container {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      background: linear-gradient(90deg, #23243d 0%, #396484 100%);
+      border-radius: 32px;
+      box-shadow: 0 8px 44px #001a 0px 0px 0px 10px #aeeaff22;
+      border: 3px solid #aeeaff;
+      max-width: 980px;
+      min-width: 650px;
+      width: 86vw;
+      min-height: 330px;
+      overflow: hidden;
+    }
+    .left-panel {
+      background: linear-gradient(135deg, #20243a 80%, #aeeaff44 100%);
+      flex: 0 0 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1.2rem 2.5rem 1.2rem;
+      border-right: 2px solid #aeeaff55;
+    }
+    .diamond-cluster-lg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3em;
+      margin-bottom: 1.3em;
+    }
+    .diamond-lg {
+      font-size: 3.2rem;
+      color: #aeeaff;
+      text-shadow: 0 0 20px #aeeaff77, 0 0 34px #fff8, 0 2px 24px #45f9ff44;
+      animation: sparkle-lg 1.6s infinite alternate;
+    }
+    .diamond-lg:nth-child(2) { font-size: 4rem; color: #eafcff; animation-delay: 0.7s;}
+    .diamond-lg:nth-child(3) { font-size: 2.7rem; color: #b8e5ff; animation-delay: 1.2s;}
+    @keyframes sparkle-lg {
+      0%   { filter: brightness(1);}
+      100% { filter: brightness(1.65);}
+    }
+    .vip-badge-lg {
+      background: linear-gradient(90deg, #eafcff 40%, #aeeaff 100%);
+      color: #212d38;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.22rem;
+      padding: 0.4em 1.2em 0.3em 1.2em;
+      border-radius: 22px;
+      font-weight: bold;
+      box-shadow: 0 3px 12px #aeeaff22;
+      letter-spacing: 0.08em;
+      border-bottom: 2px solid #aeeaff88;
+      text-shadow: 0 1px 0 #fff5, 0 2px 8px #fff4;
+      margin-bottom: 1.5em;
+      margin-top: 0.5em;
+    }
+    .right-panel {
+      flex: 1 1 auto;
+      padding: 2.2rem 3rem 2.2rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+    .headline-lg {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.25rem;
+      color: #aeeaff;
+      margin-bottom: 0.29em;
+      letter-spacing: 0.02em;
+      text-shadow: 0 0 9px #aeeaff55, 0 0 22px #fff8;
+    }
+    .recipient-lg {
+      font-weight: 600;
+      font-size: 1.18em;
+      color: #eafcff;
+      text-shadow: 0 2px 6px #aeeaff55;
+      margin-bottom: 0.5em;
+      letter-spacing: 0.01em;
+    }
+    .diamond-gradient-lg {
+      background: linear-gradient(90deg, #b6f0ff 0%, #f6feff 50%, #aeeaff 100%);
+      height: 4px;
+      width: 96%;
+      margin: 1em 0 1.3em 0;
+      border-radius: 90px;
+      box-shadow: 0 1px 7px #aeeaff44;
+    }
+    .luxury-message-lg {
+      color: #f2f4fa;
+      font-size: 1.12em;
+      line-height: 1.72;
+      font-family: 'Montserrat', Arial, sans-serif;
+      margin-bottom: 1.35em;
+    }
+    .btn-lg {
+      margin-top: 1.3em;
+      background: linear-gradient(90deg, #aeeaff 0%, #eafcff 100%);
+      color: #1a2433;
+      border: none;
+      border-radius: 13px;
+      padding: 1rem 2.7rem;
+      font-size: 1.13rem;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      box-shadow: 0 6px 20px #aeeaff44;
+      transition: background 0.2s, color 0.2s, box-shadow 0.18s;
+    }
+    .btn-lg:hover {
+      background: linear-gradient(90deg, #eafcff 0%, #aeeaff 100%);
+      color: #111;
+      box-shadow: 0 2px 12px #aeeaff99;
+    }
+    .award-footer-lg {
+      margin-top: 2.2em;
+      font-size: 1.04em;
+      color: #b9eaf6;
+      opacity: 0.85;
+      font-family: 'Montserrat', Arial, sans-serif;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 900px) {
+      .landscape-container { flex-direction: column; min-width: unset; width: 97vw;}
+      .left-panel { flex-direction: row; justify-content: flex-start; align-items: flex-start; border-right: none; border-bottom: 2px solid #aeeaff55; padding: 1.2rem 2rem 1.1rem 2rem; }
+      .right-panel { padding: 2rem 1.3rem 1.7rem 1.3rem;}
+    }
+    @media (max-width: 600px) {
+      .headline-lg { font-size: 1.27rem;}
+      .left-panel, .right-panel { padding: 1rem; }
+      .landscape-container { min-width: unset; }
+    }
+  </style>
+</head>
+<body>
+  <div class="landscape-container">
+    <div class="left-panel">
+      <div class="diamond-cluster-lg">
+        <span class="diamond-lg">💎</span>
+        <span class="diamond-lg">💎</span>
+        <span class="diamond-lg">💎</span>
+      </div>
+      <div class="vip-badge-lg">DIAMOND ACCESS</div>
+    </div>
+    <div class="right-panel">
+      <div class="headline-lg">Access Granted</div>
+      <div class="recipient-lg">Congratulations, [Recipient Name]</div>
+      <div class="diamond-gradient-lg"></div>
+      <div class="luxury-message-lg">
+        You have been awarded <strong>Diamond Status</strong>—an experience reserved for those whose brilliance and worth shine the brightest.<br><br>
+        This is your invitation to a sanctuary of pure comfort, luxury, and empowerment.<br>
+        <span style="color:#aeeaff; font-weight:600;">Your pace. Your rules. Your sanctuary.</span>
+        <br><br>
+        <em>Indulge in your moment. You deserve the very best.<br>
+        This space is crafted for you, and only you.</em>
+      </div>
+      <button class="btn-lg" onclick="alert('Diamond protocol initiated. Your private instructions will be delivered securely.')">
+        Claim Your Experience
+      </button>
+      <div class="award-footer-lg">
+        For your eyes only. Complete discretion.<br>
+        Welcome to the Diamond Circle.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

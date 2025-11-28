@@ -1,62 +1,77 @@
 # BytePad 3.0
 
-Multi-Shell Architecture Note-Taking Application with Fully Decoupled Core and Plugin-Based Extensibility.
+Multi-Surface Creative Board OS with Fully Decoupled Core and Plugin-Based Extensibility.
+
+**Status:** Phase 4 (85% Complete) - Production-ready Web/PWA, Electron Desktop, and CLI
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm/pnpm/yarn
-- For npm workspaces: npm 7+
+- **Node.js 20.x** (see `.nvmrc`)
+- **Yarn 1.22.22+** (see `package.json`)
+- **Local disk drive** (not network/mapped drive)
 
 ### Installation
 
-1. **Install dependencies:**
+1. **Verify environment:**
    ```bash
-   npm install
-   # or
-   pnpm install
-   # or
+   yarn cli:doctor
+   ```
+
+2. **Install dependencies:**
+   ```bash
    yarn install
    ```
 
-2. **Start the development server:**
+3. **Start the development server:**
    ```bash
-   npm run dev
-   # or
-   cd apps/web && npm run dev
+   yarn dev
    ```
 
-3. **Open your browser:**
+4. **Open your browser:**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
-## 📖 How to Use
+### Electron Desktop
 
-### Creating Notes
+1. **Start Next.js dev server** (Terminal 1):
+   ```bash
+   yarn dev
+   ```
 
-1. Click the **"+ Note"** button to create a new note
-2. The note will be automatically saved to IndexedDB in your browser
+2. **Start Electron app** (Terminal 2):
+   ```bash
+   yarn desktop:dev
+   ```
 
-### Automatic Tagging
+See [ELECTRON_LAUNCH_INSTRUCTIONS.md](./ELECTRON_LAUNCH_INSTRUCTIONS.md) for details.
 
-The TagGeneratorPlugin automatically detects and adds tags based on note content:
-- **"todo"** tag: when content contains "todo" or "task"
-- **"idea"** tag: when content contains "idea" or "concept"
-- **"issue"** tag: when content contains "bug" or "issue"
+## 📖 Features
 
-### Viewing Notes
+### Core Features
 
-- All notes are displayed in a grid layout
-- Each note card shows:
-  - Title
-  - Content
-  - Tags (if any)
+- ✅ **Boards & Notes**: Board-centric organization with rich notes
+- ✅ **Multi-Surface**: Web/PWA, Electron Desktop, CLI, NXCore Panel
+- ✅ **Storage Drivers**: IndexedDB, Filesystem, NXDrive (with automatic fallback)
+- ✅ **Undo/Redo**: Full history management
+- ✅ **Backup/Restore**: Automatic backups and manual restore
+- ✅ **Plugin System**: Extensible architecture
+- ✅ **Search & Filter**: Find notes quickly
+- ✅ **PWA Support**: Install as app, offline support
+- ✅ **Security**: XSS protection, validation, sanitization
 
-### Data Storage
+### Surfaces
 
-- Notes are stored locally in your browser using IndexedDB
-- Database name: `bytepad-web`
-- Data persists across browser sessions
+- **Web/PWA**: Browser-based with IndexedDB storage
+- **Electron Desktop**: Native desktop app with filesystem storage
+- **CLI Tool**: Export, import, sync operations
+- **NXCore Panel**: Embedded panel (NXDrive storage when available)
+
+### Debug Tools
+
+- **Debug Overlay**: Press `Ctrl+Alt+D` to toggle (dev mode)
+- **Bridge Diagnostics**: `/debug/bridge` - IPC health monitoring
+- **Storage Diagnostics**: `/debug/storage` - Driver status and health
 
 ## 🏗️ Project Structure
 
@@ -65,63 +80,103 @@ bytepad/
 ├── packages/
 │   ├── bytepad-core/        # Core engine
 │   ├── bytepad-types/       # Type definitions
-│   ├── bytepad-storage/     # Storage drivers (IndexedDB)
+│   ├── bytepad-storage/     # Storage drivers + manager
 │   ├── bytepad-plugins/     # Plugin bundle
 │   └── bytepad-utils/       # Utility functions
 └── apps/
-    └── web/                 # Next.js web application
+    ├── web/                 # Next.js web application
+    ├── desktop/             # Electron desktop app
+    └── cli/                 # CLI tool
 ```
 
-## 🔌 Available APIs
+## 📚 Documentation
 
-### BytePadCore
-
-```typescript
-// Create a note
-await core.createNote({ title: "My Note", content: "Note content" });
-
-// Get all notes
-const notes = core.getAllNotes();
-
-// Get a specific note
-const note = core.getNote(noteId);
-
-// Update a note
-await core.updateNote(noteId, { title: "Updated Title" });
-
-// Delete a note
-await core.deleteNote(noteId);
-
-// Flush sync queue
-await core.flushSync();
-```
+- [**Architecture**](./docs/ARCHITECTURE.md) - System architecture and design
+- [**API Reference**](./docs/API.md) - Core API documentation
+- [**Plugin Guide**](./docs/PLUGIN_GUIDE.md) - Creating plugins
+- [**Deployment**](./docs/DEPLOYMENT.md) - Deployment guides
+- [**Environment Safety**](./docs/ENVIRONMENT_SAFETY.md) - Environment requirements
+- [**Clean Install**](./docs/CLEAN_INSTALL.md) - Clean installation process
+- [**NXDrive Status**](./docs/NXDRIVE_STATUS.md) - NXDrive driver status
 
 ## 🛠️ Development
 
 ### Building
 
 ```bash
-npm run build
+# Web app
+cd apps/web && yarn build
+
+# Electron app
+cd apps/desktop && yarn package
+
+# CLI tool
+yarn cli:build
 ```
 
-### Type Checking
+### Testing
+
+**Framework:** Vitest (unit + integration tests), Playwright (E2E tests)
 
 ```bash
-npm run type-check
+# Run all tests
+yarn test
+
+# Run with UI
+yarn test:ui
+
+# Coverage report
+yarn test:coverage
+```
+
+**Test Structure:**
+- **Unit Tests:** Core engine, storage drivers (`packages/*/src/__tests__/`)
+- **Integration Tests:** Storage driver fallback, driver manager behavior
+- **E2E Tests:** Playwright for web app (`apps/web/tests/`)
+- **Coverage Target:** >80% for core and storage packages
+
+### Environment Checks
+
+```bash
+# Run doctor to check environment
+yarn cli:doctor
+
+# Specific checks
+yarn cli:doctor env
+yarn cli:doctor storage
+yarn cli:doctor electron
 ```
 
 ## 📦 Packages
 
-- **bytepad-core**: Standalone engine that works in Node, React, Electron, etc.
+- **bytepad-core**: Standalone engine (Node, React, Electron compatible)
 - **bytepad-types**: Shared TypeScript type definitions
-- **bytepad-storage**: Storage abstraction with IndexedDB driver
+- **bytepad-storage**: Storage abstraction with multiple drivers + manager
 - **bytepad-plugins**: Official plugin bundle
 - **bytepad-utils**: Helper utilities
 
-## 🔮 Future Shells
+## 🔧 CLI Commands
 
-- **Desktop**: Electron shell (coming soon)
-- **NXCore Panel**: AeroCoreOS dock widget (coming soon)
+```bash
+# Export boards
+yarn cli:export output.json
+
+# Import boards
+yarn cli:import input.json
+
+# Flush sync queue
+yarn cli:flush-sync
+
+# Environment health check
+yarn cli:doctor
+```
+
+## ⚠️ Important Notes
+
+- **Repository must be on local disk** (not network/mapped drive)
+- **Node.js 20.x required** (see `.nvmrc`)
+- **Yarn 1.22.22+ required** (see `package.json`)
+- Run `yarn cli:doctor` after cloning to verify environment
 
 ## 📝 License
 

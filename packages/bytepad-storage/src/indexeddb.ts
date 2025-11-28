@@ -1,6 +1,21 @@
 import { openDB, IDBPDatabase } from "idb";
-import type { Board, StorageDriver } from "bytepad-types";
+import type { Board, StorageDriver, StorageDriverHealth } from "bytepad-types";
 
+/**
+ * Create an IndexedDB storage driver
+ * 
+ * Stores boards in browser IndexedDB. Supports automatic migration from
+ * legacy note-based format to board-based format.
+ * 
+ * @param dbName - Database name (default: "bytepad")
+ * @returns StorageDriver implementation for IndexedDB
+ * 
+ * @example
+ * ```typescript
+ * const driver = indexedDbDriver("bytepad-web");
+ * const core = new BytePadCore({ storage: driver });
+ * ```
+ */
 export function indexedDbDriver(dbName = "bytepad"): StorageDriver {
   let db: IDBPDatabase<any> | null = null;
 
@@ -16,13 +31,14 @@ export function indexedDbDriver(dbName = "bytepad"): StorageDriver {
             }
             
             // Migrate old notes to a default board if they exist
-            // This must be done synchronously within the transaction
+            // Note: Migration must be synchronous within the transaction
+            // Using the raw IDB API for synchronous access
             if (database.objectStoreNames.contains("notes")) {
               const notesStore = transaction.objectStore("notes");
               const boardsStore = transaction.objectStore("boards");
               
-              // Use getAll() which returns a promise-like request
-              const request = notesStore.getAll();
+              // Use the raw IDBRequest API (not Promise-based) for synchronous migration
+              const request = (notesStore as any).getAll() as IDBRequest<any[]>;
               
               request.onsuccess = () => {
                 const oldNotes = request.result;
@@ -146,6 +162,29 @@ export function indexedDbDriver(dbName = "bytepad"): StorageDriver {
       } catch (err) {
         console.error("Failed to delete board from IndexedDB", err);
         throw err;
+      }
+    },
+
+    supportsTransactions(): boolean {
+      return true; // IndexedDB supports transactions
+    },
+
+    supportsBackup(): boolean {
+      return true; // Can export/import all data
+    },
+
+    async healthCheck(): Promise<StorageDriverHealth> {
+      try {
+        const d = await getDb();
+        // Try a simple read operation
+        await d.getAll("boards");
+        return { healthy: true };
+      } catch (err: any) {
+        return {
+          healthy: false,
+          message: err.message || "IndexedDB health check failed",
+          lastError: err,
+        };
       }
     },
   };

@@ -2,7 +2,7 @@
 
 import { useContext, useState, useEffect } from "react";
 import { CoreContext } from "../app/providers";
-import type { BackupMetadata } from "bytepad-storage/backup";
+import type { BackupMetadata } from "bytepad-storage";
 
 export function BackupManager() {
   const core = useContext(CoreContext);

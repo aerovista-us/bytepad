@@ -43,10 +43,31 @@ export interface SyncEvent {
   payload: any;
 }
 
+export interface StorageDriverHealth {
+  healthy: boolean;
+  message?: string;
+  lastError?: Error;
+}
+
 export interface StorageDriver {
   load(): Promise<Board[]>;
   save(board: Board): Promise<void>;
   delete(boardId: string): Promise<void>;
+  
+  /**
+   * Check if the driver supports transactions (atomic operations)
+   */
+  supportsTransactions?(): boolean;
+  
+  /**
+   * Check if the driver supports backup operations
+   */
+  supportsBackup?(): boolean;
+  
+  /**
+   * Perform a health check on the storage driver
+   */
+  healthCheck?(): Promise<StorageDriverHealth>;
 }
 
 export interface CoreConfig {
@@ -71,6 +92,19 @@ export interface CoreInstance {
   registerPlugin(plugin: Plugin): void;
   // Sync
   flushSync(): Promise<void>;
+  // History/Undo-Redo
+  undo(): Promise<boolean>;
+  redo(): Promise<boolean>;
+  canUndo(): boolean;
+  canRedo(): boolean;
+  // Backup management
+  createBackup(): Promise<any>;
+  listBackups(): any[];
+  restoreBackup(backupId: string): Promise<void>;
+  exportBackup(backupId: string): Promise<string>;
+  importBackup(jsonData: string): Promise<any>;
+  getLatestBackup(): any | null;
+  importLegacyData(jsonString: string): Promise<Board[]>;
 }
 
 export interface Plugin {

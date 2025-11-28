@@ -5,11 +5,16 @@
   "main": ".vite/build/main/index.js",
   "private": true,
   "scripts": {
+    "build:main": "node scripts/build-main.js",
+    "build:preload": "node scripts/build-preload.js",
+    "build:all": "npm run build:main && npm run build:preload",
+    "prestart": "npm run build:all",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "build": "electron-forge package --skip-make"
   },
   "dependencies": {
     "bytepad-core": "file:../../packages/bytepad-core",

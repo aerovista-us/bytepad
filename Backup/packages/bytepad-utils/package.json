@@ -1,0 +1,14 @@
+{
+  "name": "bytepad-utils",
+  "version": "3.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "dompurify": "^3.0.6",
+    "isomorphic-dompurify": "^2.9.0"
+  },
+  "devDependencies": {
+    "@types/dompurify": "^3.0.5"
+  }
+}
+

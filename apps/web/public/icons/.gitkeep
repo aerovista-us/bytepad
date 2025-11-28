@@ -1,0 +1,8 @@
+# Icon files should be placed here
+# Required icons:
+# - icon-192.png (192x192 pixels)
+# - icon-512.png (512x512 pixels)
+# 
+# These can be generated from a source image or created manually.
+# For now, the manifest will show warnings but the app will still function.
+

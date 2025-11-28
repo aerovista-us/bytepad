@@ -3,113 +3,143 @@
  * Provides unified API for both web (IndexedDB) and Electron (IPC) environments
  */
 
-// Check if running in Electron
-const isElectron = typeof window !== "undefined" && window.electronAPI !== undefined;
+import { ipcInvoke, isElectron, setBridgeError, type BridgeError } from "./bridge";
 
 /**
  * Electron-compatible core operations
  * Falls back to direct core access in web environment
  */
+/**
+ * Helper to execute IPC with error handling
+ */
+async function executeIpc<T>(
+  operation: () => Promise<T>,
+  operationName: string
+): Promise<T> {
+  if (!isElectron() || !window.electronAPI) {
+    throw new Error("Not in Electron environment - use CoreContext");
+  }
+
+  try {
+    return await ipcInvoke(operation, {
+      timeout: 5000,
+      retries: 2,
+      retryDelay: 1000,
+    });
+  } catch (error) {
+    const bridgeError = error as BridgeError;
+    setBridgeError(bridgeError);
+    
+    // Log IPC failures for diagnostics
+    console.error(`IPC operation failed: ${operationName}`, {
+      error: bridgeError.message,
+      classification: bridgeError.classification,
+      timeout: bridgeError.timeout,
+      retryable: bridgeError.retryable,
+    });
+
+    throw bridgeError;
+  }
+}
+
 export const electronBridge = {
-  isElectron: () => isElectron,
+  isElectron: () => isElectron(),
 
   // Board operations
   async createBoard(data?: any) {
-    if (isElectron && window.electronAPI) {
-      const response = await window.electronAPI.createBoard(data);
+    return executeIpc(async () => {
+      const response = await window.electronAPI!.createBoard(data);
       if (!response.success) throw new Error(response.error);
       return response.data;
-    }
-    // Web: Use direct core access (handled by CoreProvider)
-    throw new Error("Not in Electron environment - use CoreContext");
+    }, "createBoard");
   },
 
   async updateBoard(id: string, data: any) {
-    if (isElectron && window.electronAPI) {
-      const response = await window.electronAPI.updateBoard(id, data);
+    return executeIpc(async () => {
+      const response = await window.electronAPI!.updateBoard(id, data);
       if (!response.success) throw new Error(response.error);
       return response.data;
-    }
-    throw new Error("Not in Electron environment - use CoreContext");
+    }, "updateBoard");
   },
 
   async deleteBoard(id: string) {
-    if (isElectron && window.electronAPI) {
-      const response = await window.electronAPI.deleteBoard(id);
+    return executeIpc(async () => {
+      const response = await window.electronAPI!.deleteBoard(id);
       if (!response.success) throw new Error(response.error);
       return response.data;
-    }
-    throw new Error("Not in Electron environment - use CoreContext");
+    }, "deleteBoard");
   },
 
   async getAllBoards() {
-    if (isElectron && window.electronAPI) {
-      const response = await window.electronAPI.getAllBoards();
+    return executeIpc(async () => {
+      const response = await window.electronAPI!.getAllBoards();
       if (!response.success) throw new Error(response.error);
       return response.data;
-    }
-    throw new Error("Not in Electron environment - use CoreContext");
+    }, "getAllBoards");
   },
 
   // Note operations
   async createNote(boardId: string, data?: any) {
-    if (isElectron && window.electronAPI) {
-      const response = await window.electronAPI.createNote(boardId, data);
+    return executeIpc(async () => {
+      const response = await window.electronAPI!.createNote(boardId, data);
       if (!response.success) throw new Error(response.error);
       return response.data;
-    }
-    throw new Error("Not in Electron environment - use CoreContext");
+    }, "createNote");
   },
 
   async updateNote(boardId: string, noteId: string, data: any) {
-    if (isElectron && window.electronAPI) {
-      const response = await window.electronAPI.updateNote(boardId, noteId, data);
+    return executeIpc(async () => {
+      const response = await window.electronAPI!.updateNote(boardId, noteId, data);
       if (!response.success) throw new Error(response.error);
       return response.data;
-    }
-    throw new Error("Not in Electron environment - use CoreContext");
+    }, "updateNote");
   },
 
   async deleteNote(boardId: string, noteId: string) {
-    if (isElectron && window.electronAPI) {
-      const response = await window.electronAPI.deleteNote(boardId, noteId);
+    return executeIpc(async () => {
+      const response = await window.electronAPI!.deleteNote(boardId, noteId);
       if (!response.success) throw new Error(response.error);
       return response.data;
-    }
-    throw new Error("Not in Electron environment - use CoreContext");
+    }, "deleteNote");
   },
 
   // History operations
   async undo() {
-    if (isElectron && window.electronAPI) {
-      const response = await window.electronAPI.undo();
+    return executeIpc(async () => {
+      const response = await window.electronAPI!.undo();
       if (!response.success) throw new Error(response.error);
       return response.data;
-    }
-    throw new Error("Not in Electron environment - use CoreContext");
+    }, "undo");
   },
 
   async redo() {
-    if (isElectron && window.electronAPI) {
-      const response = await window.electronAPI.redo();
+    return executeIpc(async () => {
+      const response = await window.electronAPI!.redo();
       if (!response.success) throw new Error(response.error);
       return response.data;
-    }
-    throw new Error("Not in Electron environment - use CoreContext");
+    }, "redo");
   },
 
   async canUndo() {
-    if (isElectron && window.electronAPI) {
-      return await window.electronAPI.canUndo();
+    if (!isElectron() || !window.electronAPI) {
+      return false;
     }
-    return false;
+    try {
+      return await ipcInvoke(() => window.electronAPI!.canUndo(), { timeout: 1000 });
+    } catch {
+      return false;
+    }
   },
 
   async canRedo() {
-    if (isElectron && window.electronAPI) {
-      return await window.electronAPI.canRedo();
+    if (!isElectron() || !window.electronAPI) {
+      return false;
     }
-    return false;
+    try {
+      return await ipcInvoke(() => window.electronAPI!.canRedo(), { timeout: 1000 });
+    } catch {
+      return false;
+    }
   },
 };
 

@@ -21,9 +21,12 @@ export default function Home() {
 
   useEffect(() => {
     if (!core) return;
+    
+    // Store core in a const so TypeScript knows it's not null in closures
+    const coreInstance = core;
 
     // Initial load
-    const loadedBoards = core.getAllBoards();
+    const loadedBoards = coreInstance.getAllBoards();
     setBoards(loadedBoards);
     
     // Select first board or create default
@@ -32,7 +35,7 @@ export default function Home() {
       setNotes(loadedBoards[0].notes);
     } else {
       // Create default board
-      core.createBoard({ name: "My Board" }).then((board) => {
+      coreInstance.createBoard({ name: "My Board" }).then((board) => {
         setBoards([board]);
         setSelectedBoardId(board.id);
         setNotes(board.notes);
@@ -41,12 +44,13 @@ export default function Home() {
 
     // Keyboard shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!coreInstance) return;
       if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
         e.preventDefault();
-        core.undo();
+        coreInstance.undo().catch(console.error);
       } else if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) {
         e.preventDefault();
-        core.redo();
+        coreInstance.redo().catch(console.error);
       }
     };
 
@@ -55,11 +59,12 @@ export default function Home() {
 
     // Listen for board changes
     const updateBoards = () => {
-      const updatedBoards = core.getAllBoards();
+      if (!coreInstance) return;
+      const updatedBoards = coreInstance.getAllBoards();
       setBoards(updatedBoards);
       
       if (selectedBoardId) {
-        const board = core.getBoard(selectedBoardId);
+        const board = coreInstance.getBoard(selectedBoardId);
         if (board) {
           setNotes(board.notes);
         }
@@ -68,8 +73,9 @@ export default function Home() {
 
     // Listen for note changes
     const updateNotes = (payload: { boardId: string; note: Note }) => {
+      if (!coreInstance) return;
       if (payload.boardId === selectedBoardId) {
-        const board = core.getBoard(selectedBoardId);
+        const board = coreInstance.getBoard(selectedBoardId);
         if (board) {
           setNotes(board.notes);
         }
@@ -77,37 +83,35 @@ export default function Home() {
     };
 
     const handleNoteDeleted = (payload: { boardId: string; noteId: string }) => {
+      if (!coreInstance) return;
       if (payload.boardId === selectedBoardId) {
-        const board = core.getBoard(selectedBoardId);
+        const board = coreInstance.getBoard(selectedBoardId);
         if (board) {
           setNotes(board.notes);
         }
       }
     };
 
-    core.events.on("boardCreated", updateBoards);
-    core.events.on("boardUpdated", updateBoards);
-    core.events.on("boardDeleted", updateBoards);
-    core.events.on("noteCreated", updateNotes);
-    core.events.on("noteUpdated", updateNotes);
-    core.events.on("noteDeleted", handleNoteDeleted);
+    coreInstance.events.on("boardCreated", updateBoards);
+    coreInstance.events.on("boardUpdated", updateBoards);
+    coreInstance.events.on("boardDeleted", updateBoards);
+    coreInstance.events.on("noteCreated", updateNotes);
+    coreInstance.events.on("noteUpdated", updateNotes);
+    coreInstance.events.on("noteDeleted", handleNoteDeleted);
 
     return () => {
-      core.events.off("boardCreated", updateBoards);
-      core.events.off("boardUpdated", updateBoards);
-      core.events.off("boardDeleted", updateBoards);
-      core.events.off("noteCreated", updateNotes);
-      core.events.off("noteUpdated", updateNotes);
-      core.events.off("noteDeleted", handleNoteDeleted);
+      coreInstance.events.off("boardCreated", updateBoards);
+      coreInstance.events.off("boardUpdated", updateBoards);
+      coreInstance.events.off("boardDeleted", updateBoards);
+      coreInstance.events.off("noteCreated", updateNotes);
+      coreInstance.events.off("noteUpdated", updateNotes);
+      coreInstance.events.off("noteDeleted", handleNoteDeleted);
     };
   }, [core, selectedBoardId]);
 
-  if (!core) return <div>Loading BytePad…</div>;
-
-  const selectedBoard = selectedBoardId ? core.getBoard(selectedBoardId) : null;
-
-  // Filter notes based on search query
+  // Filter notes based on search query (must be before conditional return)
   const filteredNotes = useMemo(() => {
+    if (!notes) return [];
     if (!searchQuery.trim()) return notes;
     
     const query = searchQuery.toLowerCase();
@@ -118,10 +122,17 @@ export default function Home() {
     });
   }, [notes, searchQuery]);
 
+  if (!core) return <div>Loading BytePad…</div>;
+
+  // TypeScript now knows core is not null after the early return
+  const coreInstance = core;
+
+  const selectedBoard = selectedBoardId ? coreInstance.getBoard(selectedBoardId) : null;
+
   const handleCreateNote = async () => {
     if (!selectedBoardId) return;
     
-    await core.createNote(selectedBoardId, {
+    await coreInstance.createNote(selectedBoardId, {
       contentHTML: "<p>New Note</p>",
       geometry: { x: 0, y: 0, w: 200, h: 150, z: 0 },
     });
@@ -129,16 +140,16 @@ export default function Home() {
 
   const handleUpdateNote = async (noteId: string, data: Partial<Note>) => {
     if (!selectedBoardId) return;
-    await core.updateNote(selectedBoardId, noteId, data);
+    await coreInstance.updateNote(selectedBoardId, noteId, data);
   };
 
   const handleDeleteNote = async (noteId: string) => {
     if (!selectedBoardId) return;
-    await core.deleteNote(selectedBoardId, noteId);
+    await coreInstance.deleteNote(selectedBoardId, noteId);
   };
 
   const handleCreateBoard = async () => {
-    const board = await core.createBoard({ name: `Board ${boards.length + 1}` });
+    const board = await coreInstance.createBoard({ name: `Board ${boards.length + 1}` });
     setSelectedBoardId(board.id);
   };
 
@@ -149,7 +160,7 @@ export default function Home() {
     }
     
     if (confirm("Are you sure you want to delete this board? All notes will be lost.")) {
-      await core.deleteBoard(boardId);
+      await coreInstance.deleteBoard(boardId);
       // Select first remaining board
       const remaining = boards.filter((b) => b.id !== boardId);
       if (remaining.length > 0) {

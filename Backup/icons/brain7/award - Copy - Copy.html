@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIP Access Award - Landscape</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(110deg, #1a1a20 0%, #33313b 100%);
+      color: #efe7dc;
+      font-family: 'Montserrat', Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .landscape-container {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      background: linear-gradient(90deg, #22262a 0%, #393552 100%);
+      border-radius: 32px;
+      box-shadow: 0 8px 48px #000b 0px 0px 0px 8px #dfa93a22;
+      border: 3px solid #bfa045;
+      max-width: 980px;
+      min-width: 680px;
+      width: 86vw;
+      min-height: 340px;
+      overflow: hidden;
+    }
+    .left-panel {
+      background: linear-gradient(135deg, #222 60%, #dfa93a33 100%);
+      flex: 0 0 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1.2rem 2.5rem 1.2rem;
+      border-right: 2px solid #e5c97344;
+    }
+    .gold-crown-lg {
+      font-size: 4.3rem;
+      color: #ffed88;
+      margin-bottom: 1.2rem;
+      text-shadow: 0 4px 16px #dfa93a77, 0 2px 40px #fff4;
+    }
+    .vip-badge {
+      margin-top: 1rem;
+      background: linear-gradient(90deg, #ffeaa7 20%, #dfa93a 80%);
+      color: #342700;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      padding: 0.4em 1.2em 0.3em 1.2em;
+      border-radius: 22px;
+      font-weight: bold;
+      box-shadow: 0 3px 12px #dfa93a33;
+      letter-spacing: 0.09em;
+      border-bottom: 2px solid #bfa04588;
+      text-shadow: 0 1px 0 #fff3, 0 2px 10px #fff1;
+    }
+    .right-panel {
+      flex: 1 1 auto;
+      padding: 2.3rem 3rem 2.2rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+    .headline-lg {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      color: #e8c776;
+      margin-bottom: 0.3em;
+      letter-spacing: 0.025em;
+      text-shadow: 0 0 9px #bfa04544, 0 0 20px #fff6;
+    }
+    .recipient-lg {
+      font-weight: 600;
+      font-size: 1.19em;
+      color: #ffed88;
+      text-shadow: 0 2px 6px #dfa93a44;
+      margin-bottom: 0.4em;
+      letter-spacing: 0.01em;
+    }
+    .luxury-gradient-lg {
+      background: linear-gradient(90deg, #ffeaa7, #dfa93a, #fffbe2);
+      height: 4px;
+      width: 95%;
+      margin: 1em 0 1.3em 0;
+      border-radius: 90px;
+      box-shadow: 0 1px 7px #dfa93a55;
+    }
+    .luxury-message-lg {
+      color: #efe7dc;
+      font-size: 1.15em;
+      line-height: 1.7;
+      font-family: 'Montserrat', Arial, sans-serif;
+      margin-bottom: 1.2em;
+    }
+    .btn-lg {
+      margin-top: 1.6em;
+      background: linear-gradient(90deg, #ffeaa7 0%, #dfa93a 100%);
+      color: #342900;
+      border: none;
+      border-radius: 13px;
+      padding: 1rem 2.8rem;
+      font-size: 1.13rem;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      box-shadow: 0 6px 20px #dfa93a50;
+      transition: background 0.2s, color 0.2s, box-shadow 0.18s;
+    }
+    .btn-lg:hover {
+      background: linear-gradient(90deg, #dfa93a 0%, #ffeaa7 100%);
+      color: #111;
+      box-shadow: 0 2px 12px #dfa93a90;
+    }
+    .award-footer-lg {
+      margin-top: 2.1em;
+      font-size: 1.04em;
+      color: #c9c2ad;
+      opacity: 0.85;
+      font-family: 'Montserrat', Arial, sans-serif;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 900px) {
+      .landscape-container { flex-direction: column; min-width: unset; width: 97vw;}
+      .left-panel { flex-direction: row; justify-content: flex-start; align-items: flex-start; border-right: none; border-bottom: 2px solid #e5c97344; padding: 1.2rem 2rem 1.1rem 2rem; }
+      .right-panel { padding: 2rem 1.3rem 1.7rem 1.3rem;}
+    }
+    @media (max-width: 600px) {
+      .headline-lg { font-size: 1.35rem;}
+      .left-panel, .right-panel { padding: 1rem; }
+      .landscape-container { min-width: unset; }
+    }
+  </style>
+</head>
+<body>
+  <div class="landscape-container">
+    <div class="left-panel">
+      <div>
+        <div class="gold-crown-lg">👑</div>
+        <div class="vip-badge">VIP EXCLUSIVE</div>
+      </div>
+    </div>
+    <div class="right-panel">
+      <div class="headline-lg">Access Granted</div>
+      <div class="recipient-lg">Congratulations, [Recipient Name]</div>
+      <div class="luxury-gradient-lg"></div>
+      <div class="luxury-message-lg">
+        You have been handpicked for an <strong>exclusive privilege</strong>—an experience reserved for those truly deserving.
+        <br><br>
+        This is your invitation to an oasis of pure comfort, empowerment, and indulgence.<br>
+        <span style="color:#e8c776; font-weight:600;">Your rules. Your pace. Your sanctuary.</span>
+        <br><br>
+        <em>Allow yourself to receive. Enjoy the moment.  
+        This space is crafted just for you.</em>
+      </div>
+      <button class="btn-lg" onclick="alert('VIP protocol initiated. Your private instructions will be delivered securely.')">
+        Claim Your Experience
+      </button>
+      <div class="award-footer-lg">
+        For your eyes only. Complete discretion. Welcome to the inner circle.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

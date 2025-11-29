@@ -24,7 +24,55 @@ yarn build
 
 ### Deployment Options
 
-#### Vercel (Recommended)
+#### GitHub Pages (Free & Simple)
+
+GitHub Pages is a great alternative to Vercel - it's free, simple, and works well for static Next.js apps.
+
+**Prerequisites:**
+- GitHub repository
+- GitHub Actions enabled
+
+**Setup:**
+
+1. **Enable GitHub Pages:**
+   - Go to your repository → Settings → Pages
+   - Source: "GitHub Actions"
+
+2. **Deploy automatically:**
+   - The included `.github/workflows/deploy-gh-pages.yml` will automatically build and deploy on push to `main` or `develop`
+   - Or manually trigger: Actions → "Deploy to GitHub Pages" → Run workflow
+
+3. **Build locally (optional):**
+   ```bash
+   cd apps/web
+   yarn build:static
+   # Output will be in apps/web/out/
+   ```
+
+4. **Access your site:**
+   - URL: `https://aerovista-us.github.io/bytepad/`
+   - Or custom domain (configure in repository Settings → Pages)
+   
+   **Note:** The basePath is set to `/bytepad` to match the repository name. If you change the repository name, update `BASE_PATH` in the workflow file.
+
+**Configuration:**
+- Static export is automatically enabled via `next.config.js`
+- Base path is configurable via `BASE_PATH` environment variable
+- Build output goes to `apps/web/out/` directory
+
+**Advantages:**
+- ✅ Free
+- ✅ Simple setup
+- ✅ Automatic deployments via GitHub Actions
+- ✅ Custom domain support
+- ✅ No external service dependencies
+
+**Limitations:**
+- ⚠️ Static export only (no API routes, no server-side rendering)
+- ⚠️ Build time can be longer than Vercel
+- ⚠️ No preview deployments (only production)
+
+#### Vercel (Recommended for Full Next.js Features)
 
 BytePad includes a `vercel.json` configuration file for automatic setup.
 
@@ -134,6 +182,13 @@ Once your repository is connected to Vercel, deployments happen automatically:
        git push origin main
        ```
      - **Verify:** After merging/pushing, check that `apps/web/package.json` exists in the branch Vercel is using
+   - **Build completes in <1 second with "no files prepared"?**
+     - **Root Directory not set:** Vercel can't find your Next.js app because Root Directory is wrong
+     - **Fix:** Go to Vercel Dashboard → Settings → General → Root Directory → set to `apps/web` (exactly, no trailing slash)
+     - **Wrong repository:** Check that Vercel is connected to the correct GitHub repository
+     - **Build command not running:** If Root Directory is wrong, the build command won't execute
+     - **After fixing Root Directory:** Go to Deployments → Redeploy the latest deployment
+     - **Verify:** Build should take 30+ seconds (not 22ms) and show Next.js build output
 
 #### Netlify
 

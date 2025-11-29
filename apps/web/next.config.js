@@ -5,6 +5,19 @@ const nextConfig = {
   transpilePackages: ['bytepad-core', 'bytepad-types', 'bytepad-storage', 'bytepad-plugins', 'bytepad-utils'],
   // Disable SWC completely - use Babel instead
   swcMinify: false,
+  // Enable static export for GitHub Pages
+  ...(process.env.GITHUB_PAGES === 'true' ? {
+    output: 'export',
+    // GitHub Pages requires basePath and assetPrefix for subdirectory deployment
+    basePath: process.env.BASE_PATH || '',
+    assetPrefix: process.env.BASE_PATH || '',
+    // GitHub Pages works better with trailing slashes
+    trailingSlash: true,
+    // Disable image optimization for static export
+    images: {
+      unoptimized: true,
+    },
+  } : {}),
   // Force webpack to use Babel
   webpack: (config, { isServer }) => {
     // Ensure Babel is used for all JS/TS files

@@ -20,7 +20,7 @@ const config: ForgeConfig = {
     new MakerSquirrel({
       name: "bytepad-studio",
     }),
-    new MakerZIP({}, ["darwin", "linux"]),
+    new MakerZIP({}, ["win32", "darwin", "linux"]),
     new MakerDeb({
       options: {
         maintainer: "BytePad Team",

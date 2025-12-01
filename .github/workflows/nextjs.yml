@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"  # Matches bytepad engines requirement
-          cache: 'yarn'  # Root uses yarn
+          cache: 'yarn'  # Both root and apps/web use yarn
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -51,7 +51,7 @@ jobs:
 
       - name: Install web app dependencies
         working-directory: apps/web
-        run: npm install
+        run: yarn install --frozen-lockfile
 
       - name: Restore cache
         uses: actions/cache@v4
@@ -59,19 +59,39 @@ jobs:
           path: |
             apps/web/.next/cache
           # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('apps/web/**.[jt]s', 'apps/web/**.[jt]sx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('apps/web/**.[jt]s', 'apps/web/**.[jt]sx') }}
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-
 
       - name: Build with Next.js
         working-directory: apps/web
-        run: npm run build
         env:
-          GITHUB_PAGES: true
+          GITHUB_PAGES: 'true'
           # If deploying to a subdirectory (e.g., /bytepad/), set BASE_PATH:
           # BASE_PATH: /bytepad
           # For root domain deployment, leave BASE_PATH unset or empty
+        run: |
+          echo "Building Next.js app with static export..."
+          echo "GITHUB_PAGES=$GITHUB_PAGES"
+          yarn build || (echo "Build failed! Check errors above." && exit 1)
+
+      - name: Verify build output
+        working-directory: apps/web
+        run: |
+          if [ ! -d "out" ]; then
+            echo "ERROR: Build output directory 'out' not found!"
+            echo "Listing apps/web directory:"
+            ls -la
+            exit 1
+          fi
+          echo "Build output found. Contents:"
+          ls -la out/ | head -20
+          if [ ! -f "out/index.html" ]; then
+            echo "ERROR: index.html not found in build output!"
+            exit 1
+          fi
+          echo "✓ Build output verified successfully"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
